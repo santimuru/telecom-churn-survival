@@ -712,10 +712,13 @@ elif section == "SHAP Explorer":
                 tickmode="array",
                 tickvals=list(range(top_n)),
                 ticktext=[feature_names[i] for i in top_features_idx],
+                tickfont=dict(color="#111827"),
             ),
+            xaxis=dict(tickfont=dict(color="#111827"), title_font=dict(color="#111827")),
             height=550,
             plot_bgcolor="white",
             paper_bgcolor="white",
+            font=dict(color="#111827"),
         )
         st.plotly_chart(fig_bee, use_container_width=True)
         st.markdown("**Red** = high feature value, **Blue** = low feature value. X-axis = SHAP value (positive → increases churn prediction).")
@@ -996,6 +999,9 @@ elif section == "Simulator":
                     height=420,
                     plot_bgcolor="white",
                     paper_bgcolor="white",
+                    font=dict(color="#111827"),
+                    xaxis=dict(tickfont=dict(color="#111827"), title_font=dict(color="#111827")),
+                    yaxis=dict(tickfont=dict(color="#111827")),
                 )
                 st.plotly_chart(fig_wf, use_container_width=True)
                 st.markdown(f'<div style="background:rgba(99,91,255,0.12);border-left:4px solid #635BFF;padding:12px 16px;border-radius:4px;margin:12px 0;color:inherit;">Red bars push the prediction toward churn; blue bars push away from churn. Base value = {exp_val:.3f} (population average).</div>',
