@@ -326,7 +326,7 @@ elif section == "Survival Analysis":
             paper_bgcolor="white",
             font=dict(color="#111827"),
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True, theme=None)
 
         # Summary table
         rows = []
@@ -417,7 +417,7 @@ elif section == "Survival Analysis":
             height=420,
             coloraxis_colorbar=dict(title="Survival Prob", tickformat=".0%"),
         )
-        st.plotly_chart(fig_hm, use_container_width=True)
+        st.plotly_chart(fig_hm, use_container_width=True, theme=None)
         st.markdown('<div style="background:rgba(99,91,255,0.12);border-left:4px solid #635BFF;padding:12px 16px;border-radius:4px;margin:12px 0;color:inherit;">Green = high survival probability (low churn risk). Red = low survival probability (high churn risk).</div>',
                     unsafe_allow_html=True)
 
@@ -479,7 +479,7 @@ elif section == "Survival Analysis":
             paper_bgcolor="white",
             font=dict(color="#111827"),
         )
-        st.plotly_chart(fig_cox, use_container_width=True)
+        st.plotly_chart(fig_cox, use_container_width=True, theme=None)
 
         # Interpretation
         risk_factors = filtered[filtered["coef"] > 0].sort_values("coef", ascending=False).head(3)
@@ -559,7 +559,7 @@ elif section == "Model Performance":
             paper_bgcolor="white",
             font=dict(color="#111827"),
         )
-        st.plotly_chart(fig_roc, use_container_width=True)
+        st.plotly_chart(fig_roc, use_container_width=True, theme=None)
 
     # ── PR ────────────────────────────────────────────────────────────────────
     with tab2:
@@ -586,7 +586,7 @@ elif section == "Model Performance":
             paper_bgcolor="white",
             font=dict(color="#111827"),
         )
-        st.plotly_chart(fig_pr, use_container_width=True)
+        st.plotly_chart(fig_pr, use_container_width=True, theme=None)
 
     # ── Calibration ───────────────────────────────────────────────────────────
     with tab3:
@@ -617,7 +617,7 @@ elif section == "Model Performance":
             paper_bgcolor="white",
             font=dict(color="#111827"),
         )
-        st.plotly_chart(fig_cal, use_container_width=True)
+        st.plotly_chart(fig_cal, use_container_width=True, theme=None)
 
     # ── Comparison table ──────────────────────────────────────────────────────
     with tab4:
@@ -655,7 +655,7 @@ elif section == "Model Performance":
             paper_bgcolor="white",
             font=dict(color="#111827"),
         )
-        st.plotly_chart(fig_bar, use_container_width=True)
+        st.plotly_chart(fig_bar, use_container_width=True, theme=None)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -726,7 +726,7 @@ elif section == "SHAP Explorer":
             paper_bgcolor="white",
             font=dict(color="#111827"),
         )
-        st.plotly_chart(fig_bee, use_container_width=True)
+        st.plotly_chart(fig_bee, use_container_width=True, theme=None)
         st.markdown("**Red** = high feature value, **Blue** = low feature value. X-axis = SHAP value (positive → increases churn prediction).")
 
     # ── Bar chart ─────────────────────────────────────────────────────────────
@@ -750,7 +750,7 @@ elif section == "SHAP Explorer":
             paper_bgcolor="white",
             font=dict(color="#111827"),
         )
-        st.plotly_chart(fig_bar, use_container_width=True)
+        st.plotly_chart(fig_bar, use_container_width=True, theme=None)
 
     # ── Dependence plot ───────────────────────────────────────────────────────
     with tab3:
@@ -800,7 +800,7 @@ elif section == "SHAP Explorer":
             paper_bgcolor="white",
             font=dict(color="#111827"),
         )
-        st.plotly_chart(fig_dep, use_container_width=True)
+        st.plotly_chart(fig_dep, use_container_width=True, theme=None)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -925,7 +925,7 @@ elif section == "Simulator":
                 title={"text": f"Churn Probability<br><b style='color:{risk_color}'>{risk_level}</b>"},
             ))
             fig_gauge.update_layout(height=280, margin=dict(t=40, b=20, l=20, r=20))
-            st.plotly_chart(fig_gauge, use_container_width=True)
+            st.plotly_chart(fig_gauge, use_container_width=True, theme=None)
 
         with gb:
             st.markdown(f"### {risk_level}")
@@ -1011,7 +1011,7 @@ elif section == "Simulator":
                     xaxis=dict(tickfont=dict(color="#111827"), title_font=dict(color="#111827")),
                     yaxis=dict(tickfont=dict(color="#111827")),
                 )
-                st.plotly_chart(fig_wf, use_container_width=True)
+                st.plotly_chart(fig_wf, use_container_width=True, theme=None)
                 st.markdown(f'<div style="background:rgba(99,91,255,0.12);border-left:4px solid #635BFF;padding:12px 16px;border-radius:4px;margin:12px 0;color:inherit;">Red bars push the prediction toward churn; blue bars push away from churn. Base value = {exp_val:.3f} (population average).</div>',
                             unsafe_allow_html=True)
             except Exception as e:
@@ -1073,7 +1073,7 @@ elif section == "Simulator":
                 paper_bgcolor="white",
                 font=dict(color="#111827"),
             )
-            st.plotly_chart(fig_surv, use_container_width=True)
+            st.plotly_chart(fig_surv, use_container_width=True, theme=None)
         except Exception as e:
             st.info(f"Survival profile not available: {e}")
 
@@ -1135,7 +1135,7 @@ elif section == "Revenue Impact":
         paper_bgcolor="white",
         font=dict(color="#111827"),
     )
-    st.plotly_chart(fig_lift, use_container_width=True)
+    st.plotly_chart(fig_lift, use_container_width=True, theme=None)
 
     # Key lift stats
     for pct_show in [0.10, 0.20, 0.30, 0.50]:
@@ -1224,7 +1224,7 @@ elif section == "Revenue Impact":
         paper_bgcolor="white",
         font=dict(color="#111827"),
     )
-    st.plotly_chart(fig_sens, use_container_width=True)
+    st.plotly_chart(fig_sens, use_container_width=True, theme=None)
     st.markdown(
         f'<div style="background:rgba(99,91,255,0.12);border-left:4px solid #635BFF;padding:12px 16px;border-radius:4px;margin:12px 0;color:inherit;">Optimal strategy: target the top <b>{int(optimal_pct*100)}%</b> of customers by churn score for an estimated net ROI of <b>${optimal_roi:,.0f}</b>.</div>',
         unsafe_allow_html=True
