@@ -324,6 +324,7 @@ elif section == "Survival Analysis":
             legend=dict(orientation="h", yanchor="top", y=-0.18),
             plot_bgcolor="white",
             paper_bgcolor="white",
+            font=dict(color="#111827"),
         )
         st.plotly_chart(fig, use_container_width=True)
 
@@ -476,6 +477,7 @@ elif section == "Survival Analysis":
             height=max(420, len(filtered) * 32 + 120),
             plot_bgcolor="white",
             paper_bgcolor="white",
+            font=dict(color="#111827"),
         )
         st.plotly_chart(fig_cox, use_container_width=True)
 
@@ -555,6 +557,7 @@ elif section == "Model Performance":
             height=480,
             plot_bgcolor="white",
             paper_bgcolor="white",
+            font=dict(color="#111827"),
         )
         st.plotly_chart(fig_roc, use_container_width=True)
 
@@ -581,6 +584,7 @@ elif section == "Model Performance":
             height=480,
             plot_bgcolor="white",
             paper_bgcolor="white",
+            font=dict(color="#111827"),
         )
         st.plotly_chart(fig_pr, use_container_width=True)
 
@@ -611,6 +615,7 @@ elif section == "Model Performance":
             height=480,
             plot_bgcolor="white",
             paper_bgcolor="white",
+            font=dict(color="#111827"),
         )
         st.plotly_chart(fig_cal, use_container_width=True)
 
@@ -648,6 +653,7 @@ elif section == "Model Performance":
             height=420,
             plot_bgcolor="white",
             paper_bgcolor="white",
+            font=dict(color="#111827"),
         )
         st.plotly_chart(fig_bar, use_container_width=True)
 
@@ -742,6 +748,7 @@ elif section == "SHAP Explorer":
             height=520,
             plot_bgcolor="white",
             paper_bgcolor="white",
+            font=dict(color="#111827"),
         )
         st.plotly_chart(fig_bar, use_container_width=True)
 
@@ -791,6 +798,7 @@ elif section == "SHAP Explorer":
             height=460,
             plot_bgcolor="white",
             paper_bgcolor="white",
+            font=dict(color="#111827"),
         )
         st.plotly_chart(fig_dep, use_container_width=True)
 
@@ -1063,6 +1071,7 @@ elif section == "Simulator":
                 height=380,
                 plot_bgcolor="white",
                 paper_bgcolor="white",
+                font=dict(color="#111827"),
             )
             st.plotly_chart(fig_surv, use_container_width=True)
         except Exception as e:
@@ -1124,6 +1133,7 @@ elif section == "Revenue Impact":
         height=460,
         plot_bgcolor="white",
         paper_bgcolor="white",
+        font=dict(color="#111827"),
     )
     st.plotly_chart(fig_lift, use_container_width=True)
 
@@ -1212,6 +1222,7 @@ elif section == "Revenue Impact":
         height=380,
         plot_bgcolor="white",
         paper_bgcolor="white",
+        font=dict(color="#111827"),
     )
     st.plotly_chart(fig_sens, use_container_width=True)
     st.markdown(
