@@ -5,8 +5,6 @@ fits a Cox PH model and Kaplan-Meier curves, computes SHAP values,
 and saves all artifacts to models/.
 """
 
-import os
-import sys
 import warnings
 import requests
 import numpy as np
@@ -15,7 +13,7 @@ import joblib
 
 from pathlib import Path
 
-warnings.filterwarnings("ignore")
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 # ── Paths ────────────────────────────────────────────────────────────────────
 ROOT = Path(__file__).resolve().parent.parent
@@ -312,14 +310,11 @@ def build_shap_data(pipeline, X_train, X_test, feature_names, model_name):
         print(f"[shap] Skipping SHAP (best model is {model_name}, not XGBoost)")
         return None
 
-    import shap
-
-    print("[shap] Computing SHAP values ...")
+    print("[shap] Computing SHAP values via XGBoost pred_contribs ...")
     prep = pipeline.named_steps["prep"]
     clf = pipeline.named_steps["clf"]
 
     X_test_prep = prep.transform(X_test)
-    X_bg_prep = prep.transform(X_train.sample(100, random_state=42))
 
     n_shap = min(500, len(X_test_prep))
     rng = np.random.default_rng(42)

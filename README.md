@@ -4,33 +4,31 @@
 
 Traditional churn models answer *will this customer leave?* — a binary yes/no. This project goes further: **when will they leave?** Survival analysis treats customer tenure as a time-to-event problem, quantifying urgency alongside likelihood and enabling prioritized retention interventions.
 
-Applied a similar methodology in a production environment at a cable operator, scoring ~40,000 customers weekly for proactive outreach.
-
 ---
 
 ## Live Dashboard
 
-| Section            | What you'll find                                                              |
-| ------------------ | ----------------------------------------------------------------------------- |
-| 📊 Overview        | Business context, KPIs, methodology summary, key findings                    |
-| 📈 Survival        | Kaplan-Meier curves by segment, survival heatmap, Cox PH forest plot          |
-| 🎯 Model Perf.     | ROC, Precision-Recall, calibration curves — LR vs. RF vs. XGBoost            |
-| 🔍 SHAP Explorer   | Global beeswarm, mean SHAP bar chart, per-feature dependence plots            |
-| 🔮 Simulator       | Enter any customer profile: churn probability + SHAP waterfall + Cox curve   |
-| 💰 Revenue Impact  | Lift curve, ROI calculator, sensitivity analysis vs. targeting %             |
+| Section           | What you'll find                                                             |
+| ----------------- | ---------------------------------------------------------------------------- |
+| Overview          | Business context, KPIs, methodology summary, key findings                   |
+| Survival          | Kaplan-Meier curves by segment, survival heatmap, Cox PH forest plot         |
+| Model Perf.       | ROC, Precision-Recall, calibration curves — LR vs. RF vs. XGBoost           |
+| SHAP Explorer     | Global beeswarm, mean SHAP bar chart, per-feature dependence plots           |
+| Simulator         | Enter any customer profile: churn probability + SHAP waterfall + Cox curve  |
+| Revenue Impact    | Lift curve, ROI calculator, sensitivity analysis vs. targeting %            |
 
 ---
 
 ## Why Survival Analysis
 
-Most portfolios classify churn as binary. Survival analysis adds the time dimension:
+Binary classification models tell you *if* a customer will churn. Survival analysis adds the time dimension:
 
-| Technique                     | What it models                                                         |
-| ----------------------------- | ---------------------------------------------------------------------- |
-| **Kaplan-Meier**              | Non-parametric survival curves by segment, with log-rank significance  |
-| **Cox Proportional Hazards**  | Hazard ratios per feature — which variables accelerate or protect      |
-| **XGBoost classifier**        | Overall churn probability optimized for AUC-ROC                        |
-| **SHAP TreeExplainer**        | Local + global feature attribution for the classification model        |
+| Technique                    | What it models                                                        |
+| ---------------------------- | --------------------------------------------------------------------- |
+| Kaplan-Meier                 | Non-parametric survival curves by segment, with log-rank significance |
+| Cox Proportional Hazards     | Hazard ratios per feature — which variables accelerate or protect     |
+| XGBoost classifier           | Overall churn probability optimized for AUC-ROC                       |
+| XGBoost pred_contribs (SHAP) | Local + global feature attribution for the classification model       |
 
 Together they answer: who is at risk, how urgent is it, and why — in one unified dashboard.
 
@@ -38,16 +36,16 @@ Together they answer: who is at risk, how urgent is it, and why — in one unifi
 
 ## Key Results
 
-- **Contract type** is the strongest predictor: month-to-month customers have a median survival of ~18 months vs. >60 months for 2-year contracts.
+- **Contract type** is the strongest predictor: month-to-month customers have materially shorter median survival than 1- or 2-year contract holders (exact values shown on the live dashboard).
 - **Targeting the top 20%** by churn score captures the majority of all churners — a 3-4x lift over random selection.
 - **Online Security and Tech Support** are the strongest protective factors in the Cox model (HR < 1, p < 0.001).
-- Monthly charges above $65 increase churn hazard independently of contract type.
+- Customers with above-median monthly charges churn at substantially higher rates than those below (computed live in the dashboard).
 
 ---
 
 ## Dataset
 
-IBM Telco Customer Churn — 7,043 customers, 20 features, 26.5% churn rate. Publicly available on Kaggle.
+IBM Telco Customer Churn — 7,043 customers, 19 features, 26.5% churn rate. Publicly available on Kaggle.
 
 ---
 

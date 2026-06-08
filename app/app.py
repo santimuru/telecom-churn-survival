@@ -1,10 +1,8 @@
 """
 Telecom Churn Survival Analysis — Streamlit Dashboard
-Portfolio project: Survival Analysis + XGBoost + SHAP + Business Impact
+Survival Analysis + XGBoost + Business Impact
 """
 
-import os
-import sys
 import warnings
 import numpy as np
 import pandas as pd
@@ -14,7 +12,7 @@ import plotly.express as px
 import streamlit as st
 from pathlib import Path
 
-warnings.filterwarnings("ignore")
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 ROOT = Path(__file__).resolve().parent.parent
@@ -31,7 +29,6 @@ COLORS     = [C_PRIMARY, C_DANGER, C_SAFE, C_WARNING, "#06B6D4", "#8B5CF6"]
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="Telecom Churn Survival Analysis",
-    page_icon="📡",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -76,7 +73,7 @@ model, cox, km_data, shap_data, meta, load_error = load_artifacts()
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("## 📡 Telecom Churn")
+    st.markdown("## Telecom Churn")
     st.markdown("#### Survival Analysis")
     st.markdown("---")
 
@@ -107,11 +104,33 @@ if load_error:
 
 # ── Helper functions ──────────────────────────────────────────────────────────
 def _get_lift_at_20(meta):
-    """Helper: get % churners captured when targeting top 20%."""
+    """Return fraction of churners captured when targeting top 20%."""
     ld = meta["lift_data"]
     arr_t = np.array(ld["pct_targeted"])
     arr_c = np.array(ld["pct_churn_captured"])
     return float(np.interp(0.20, arr_t, arr_c))
+
+
+def callout(text: str, color: str = C_PRIMARY) -> None:
+    """Render a left-bordered callout box."""
+    bg = f"rgba({int(color[1:3],16)},{int(color[3:5],16)},{int(color[5:7],16)},0.12)"
+    st.markdown(
+        f'<div style="background:{bg};border-left:4px solid {color};'
+        f'padding:12px 16px;border-radius:4px;margin:12px 0;color:inherit;">'
+        f'{text}</div>',
+        unsafe_allow_html=True,
+    )
+
+
+@st.cache_data
+def load_telco_csv() -> pd.DataFrame:
+    """Load and clean the Telco CSV once; shared by all sections."""
+    data_path = ROOT / "data" / "Telco-Customer-Churn.csv"
+    df = pd.read_csv(data_path)
+    df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce")
+    df["TotalCharges"].fillna(df["TotalCharges"].median(), inplace=True)
+    df["Churn_bin"] = (df["Churn"] == "Yes").astype(int)
+    return df
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -123,17 +142,7 @@ if section == "Overview":
     st.markdown('<div style="font-size:1.05rem;margin-bottom:1.5rem;opacity:0.75;">Combining time-to-event modeling, ML classification, and business impact quantification</div>',
                 unsafe_allow_html=True)
 
-    # Load raw data for some stats
-    @st.cache_data
-    def load_raw():
-        data_path = ROOT / "data" / "Telco-Customer-Churn.csv"
-        df = pd.read_csv(data_path)
-        df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce")
-        df["TotalCharges"].fillna(df["TotalCharges"].median(), inplace=True)
-        df["Churn_bin"] = (df["Churn"] == "Yes").astype(int)
-        return df
-
-    df_raw = load_raw()
+    df_raw = load_telco_csv()
 
     churned = df_raw[df_raw["Churn_bin"] == 1]
     retained = df_raw[df_raw["Churn_bin"] == 0]
@@ -162,10 +171,6 @@ Traditional churn models answer *"will this customer churn?"* — a binary yes/n
 This project goes further by answering **"*when* will this customer churn?"** using
 survival analysis, allowing retention teams to prioritize interventions by urgency,
 not just likelihood.
-
-**Deployed context:** This model scores the full customer base weekly.
-Customers in the top decile of predicted churn risk within the next 6 months
-are automatically enrolled in the retention workflow.
         """)
 
     with col_r:
@@ -197,13 +202,13 @@ are automatically enrolled in the retention workflow.
         """)
     with m2:
         st.markdown("""
-**Classification + SHAP**
+**Classification + Feature Attribution**
 
 - 3 models benchmarked (LR, RF, XGBoost)
 - Selected by AUC-ROC on held-out test set
-- SHAP TreeExplainer for global + local explanations
+- XGBoost native pred_contribs for global + local explanations
 - Beeswarm, bar, and dependence plots
-- Per-customer SHAP waterfall in Simulator
+- Per-customer SHAP-style waterfall in Simulator
         """)
     with m3:
         st.markdown("""
@@ -218,12 +223,23 @@ are automatically enrolled in the retention workflow.
 
     st.markdown("---")
     st.subheader("Key Findings")
+
+    # Compute median survival for month-to-month from the saved KM artifact
+    _mtm_median = km_data.get("Contract", {}).get("Month-to-month", {}).get("median")
+    _mtm_median_str = f"~{_mtm_median:.0f} months" if _mtm_median else "shorter"
+
+    # Compute monthly-charge threshold above-median churn signal from raw data
+    _charge_median = df_raw["MonthlyCharges"].median()
+    _high_churn = df_raw[df_raw["MonthlyCharges"] > _charge_median]["Churn_bin"].mean()
+    _low_churn  = df_raw[df_raw["MonthlyCharges"] <= _charge_median]["Churn_bin"].mean()
+
+    lift20 = _get_lift_at_20(meta)
     st.markdown(f"""
 - **Contract type** is the single strongest predictor of churn: month-to-month customers churn at dramatically higher rates than 1- or 2-year contracts.
-- **Median survival** for month-to-month customers is approximately **18 months**, compared to >60 months for annual contract holders.
-- **The top 20% of customers by predicted churn score capture ~{_get_lift_at_20(meta):.0%} of all churners**, offering a {_get_lift_at_20(meta)/0.20:.1f}x improvement over random targeting.
-- **Online Security and Tech Support** are the strongest *protective* factors in the Cox model — customers with these services have significantly lower hazard rates.
-- Monthly charges above $65 are associated with substantially increased churn hazard, even after controlling for contract type.
+- **Median survival** for month-to-month customers is {_mtm_median_str}; annual contract holders' median survival exceeds the 72-month observation window (churn never reaches 50% within the study period).
+- **The top 20% of customers by predicted churn score capture ~{lift20:.0%} of all churners**, a {lift20/0.20:.1f}x improvement over random targeting.
+- **Online Security and Tech Support** are the strongest protective factors in the Cox model — customers with these services have significantly lower hazard rates.
+- Customers with monthly charges above the dataset median (${_charge_median:.0f}) churn at {_high_churn:.1%} vs. {_low_churn:.1%} below it.
     """)
 
 
@@ -345,15 +361,13 @@ elif section == "Survival Analysis":
         if not np.isnan(pvalue):
             if pvalue < 0.001:
                 interp = "Highly significant difference (p < 0.001) — survival curves differ substantially between groups."
-                div_style = "background:rgba(99,91,255,0.12);border-left:4px solid #635BFF;padding:12px 16px;border-radius:4px;margin:12px 0;color:inherit;"
+                callout(f"Log-rank test: {interp}", C_PRIMARY)
             elif pvalue < 0.05:
                 interp = f"Significant difference (p = {pvalue:.4f}) — groups show different survival patterns."
-                div_style = "background:rgba(99,91,255,0.12);border-left:4px solid #635BFF;padding:12px 16px;border-radius:4px;margin:12px 0;color:inherit;"
+                callout(f"Log-rank test: {interp}", C_PRIMARY)
             else:
                 interp = f"No significant difference (p = {pvalue:.4f}) — groups have similar survival patterns."
-                div_style = "background:rgba(245,158,11,0.12);border-left:4px solid #F59E0B;padding:12px 16px;border-radius:4px;margin:12px 0;color:inherit;"
-            st.markdown(f'<div style="{div_style}">Log-rank test: {interp}</div>',
-                        unsafe_allow_html=True)
+                callout(f"Log-rank test: {interp}", C_WARNING)
 
     # ── Tab 2: Survival Heatmap ───────────────────────────────────────────────
     with tab2:
@@ -363,11 +377,7 @@ elif section == "Survival Analysis":
         @st.cache_data
         def build_heatmap_data():
             from lifelines import KaplanMeierFitter
-            data_path = ROOT / "data" / "Telco-Customer-Churn.csv"
-            df = pd.read_csv(data_path)
-            df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce")
-            df["TotalCharges"].fillna(df["TotalCharges"].median(), inplace=True)
-            df["Churn_bin"] = (df["Churn"] == "Yes").astype(int)
+            df = load_telco_csv()
 
             time_points = [6, 12, 24, 36, 48, 72]
             combos = []
@@ -422,8 +432,7 @@ elif section == "Survival Analysis":
             font=dict(color="#111827"),
         )
         st.plotly_chart(fig_hm, use_container_width=True, theme=None)
-        st.markdown('<div style="background:rgba(99,91,255,0.12);border-left:4px solid #635BFF;padding:12px 16px;border-radius:4px;margin:12px 0;color:inherit;">Green = high survival probability (low churn risk). Red = low survival probability (high churn risk).</div>',
-                    unsafe_allow_html=True)
+        callout("Green = high survival probability (low churn risk). Red = low survival probability (high churn risk).")
 
     # ── Tab 3: Cox PH ─────────────────────────────────────────────────────────
     with tab3:
@@ -596,8 +605,7 @@ elif section == "Model Performance":
 
     # ── Calibration ───────────────────────────────────────────────────────────
     with tab3:
-        st.markdown('<div style="background:rgba(99,91,255,0.12);border-left:4px solid #635BFF;padding:12px 16px;border-radius:4px;margin:12px 0;color:inherit;">A well-calibrated model outputs probabilities that match observed frequencies. Points on the diagonal = perfect calibration.</div>',
-                    unsafe_allow_html=True)
+        callout("A well-calibrated model outputs probabilities that match observed frequencies. Points on the diagonal = perfect calibration.")
         fig_cal = go.Figure()
         fig_cal.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode="lines",
                                       line=dict(color="gray", dash="dash"),
@@ -824,17 +832,7 @@ elif section == "Simulator":
     cat_cols = meta["cat_cols"]
     num_cols = meta["num_cols"]
 
-    # Load reference data for option lists
-    @st.cache_data
-    def get_options():
-        data_path = ROOT / "data" / "Telco-Customer-Churn.csv"
-        df = pd.read_csv(data_path)
-        df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce")
-        df["TotalCharges"].fillna(df["TotalCharges"].median(), inplace=True)
-        df["Churn_bin"] = (df["Churn"] == "Yes").astype(int)
-        return df
-
-    df_ref = get_options()
+    df_ref = load_telco_csv()
 
     # ── Input form ────────────────────────────────────────────────────────────
     with st.form("simulator_form"):
@@ -1023,8 +1021,7 @@ elif section == "Simulator":
                     yaxis=dict(tickfont=dict(color="#111827"), automargin=True),
                 )
                 st.plotly_chart(fig_wf, use_container_width=True, theme=None)
-                st.markdown(f'<div style="background:rgba(99,91,255,0.12);border-left:4px solid #635BFF;padding:12px 16px;border-radius:4px;margin:12px 0;color:inherit;">Red bars push the prediction toward churn; blue bars push away from churn. Base value = {exp_val:.3f} (population average).</div>',
-                            unsafe_allow_html=True)
+                callout(f"Red bars push the prediction toward churn; blue bars push away from churn. Base value = {exp_val:.3f} (population average).")
             except Exception as e:
                 st.info(f"SHAP waterfall not available: {e}")
 
@@ -1236,7 +1233,4 @@ elif section == "Revenue Impact":
         font=dict(color="#111827"),
     )
     st.plotly_chart(fig_sens, use_container_width=True, theme=None)
-    st.markdown(
-        f'<div style="background:rgba(99,91,255,0.12);border-left:4px solid #635BFF;padding:12px 16px;border-radius:4px;margin:12px 0;color:inherit;">Optimal strategy: target the top <b>{int(optimal_pct*100)}%</b> of customers by churn score for an estimated net ROI of <b>${optimal_roi:,.0f}</b>.</div>',
-        unsafe_allow_html=True
-    )
+    callout(f"Optimal strategy: target the top <b>{int(optimal_pct*100)}%</b> of customers by churn score for an estimated net ROI of <b>${optimal_roi:,.0f}</b>.")
