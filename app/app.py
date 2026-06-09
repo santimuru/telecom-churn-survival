@@ -102,7 +102,7 @@ html, body, [class*="css"], .stMarkdown, p, li, span, div {{
 /* no sidebar */
 [data-testid="stSidebar"], [data-testid="stSidebarCollapsedControl"] {{ display:none !important; }}
 
-.block-container {{ max-width:1160px; padding-top:1.1rem; padding-bottom:4rem; }}
+.block-container {{ max-width:1160px; padding-top:2.6rem; padding-bottom:4rem; }}
 
 /* headings */
 h1 {{ font-weight:700; letter-spacing:-0.02em; line-height:1.0;
