@@ -10,13 +10,13 @@ Traditional churn models answer _will this customer leave?_, a binary yes/no. Th
 
 Five sections, one continuous reading per section (no charts buried in nested tabs):
 
-| Section         | What you'll find                                                            |
-| --------------- | -------------------------------------------------------------------------- |
-| Brief           | Business context, KPIs, methodology, key findings                          |
-| Survival        | Kaplan-Meier curves by segment, survival heatmap, Cox PH forest plot       |
+| Section         | What you'll find                                                                 |
+| --------------- | -------------------------------------------------------------------------------- |
+| Brief           | Business context, KPIs, methodology, key findings                                |
+| Survival        | Kaplan-Meier curves by segment, survival heatmap, Cox PH forest plot             |
 | Model & Drivers | ROC, precision-recall, calibration (LR vs. RF vs. XGBoost) plus SHAP attribution |
-| Simulator       | Enter any customer profile: churn probability + SHAP waterfall + Cox curve |
-| Impact          | Lift curve, ROI calculator, sensitivity analysis vs. targeting %           |
+| Simulator       | Enter any customer profile: churn probability + SHAP waterfall + Cox curve       |
+| Impact          | Lift curve, ROI calculator, sensitivity analysis vs. targeting %                 |
 
 ---
 
