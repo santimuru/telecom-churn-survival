@@ -2,42 +2,43 @@
 
 > **Live demo:** [telecom-churn-survival-santiagomuru.streamlit.app](https://telecom-churn-survival-santiagomuru.streamlit.app/)
 
-Traditional churn models answer *will this customer leave?* — a binary yes/no. This project goes further: **when will they leave?** Survival analysis treats customer tenure as a time-to-event problem, quantifying urgency alongside likelihood and enabling prioritized retention interventions.
+Traditional churn models answer _will this customer leave?_, a binary yes/no. This project goes further: **when will they leave?** Survival analysis treats customer tenure as a time-to-event problem, quantifying urgency alongside likelihood and enabling prioritized retention interventions.
 
 ---
 
 ## Live Dashboard
 
-| Section           | What you'll find                                                             |
-| ----------------- | ---------------------------------------------------------------------------- |
-| Overview          | Business context, KPIs, methodology summary, key findings                   |
-| Survival          | Kaplan-Meier curves by segment, survival heatmap, Cox PH forest plot         |
-| Model Perf.       | ROC, Precision-Recall, calibration curves — LR vs. RF vs. XGBoost           |
-| SHAP Explorer     | Global beeswarm, mean SHAP bar chart, per-feature dependence plots           |
-| Simulator         | Enter any customer profile: churn probability + SHAP waterfall + Cox curve  |
-| Revenue Impact    | Lift curve, ROI calculator, sensitivity analysis vs. targeting %            |
+Five sections, one continuous reading per section (no charts buried in nested tabs):
+
+| Section         | What you'll find                                                            |
+| --------------- | -------------------------------------------------------------------------- |
+| Brief           | Business context, KPIs, methodology, key findings                          |
+| Survival        | Kaplan-Meier curves by segment, survival heatmap, Cox PH forest plot       |
+| Model & Drivers | ROC, precision-recall, calibration (LR vs. RF vs. XGBoost) plus SHAP attribution |
+| Simulator       | Enter any customer profile: churn probability + SHAP waterfall + Cox curve |
+| Impact          | Lift curve, ROI calculator, sensitivity analysis vs. targeting %           |
 
 ---
 
 ## Why Survival Analysis
 
-Binary classification models tell you *if* a customer will churn. Survival analysis adds the time dimension:
+Binary classification models tell you _if_ a customer will churn. Survival analysis adds the time dimension:
 
 | Technique                    | What it models                                                        |
 | ---------------------------- | --------------------------------------------------------------------- |
 | Kaplan-Meier                 | Non-parametric survival curves by segment, with log-rank significance |
-| Cox Proportional Hazards     | Hazard ratios per feature — which variables accelerate or protect     |
+| Cox Proportional Hazards     | Hazard ratios per feature · which variables accelerate or protect     |
 | XGBoost classifier           | Overall churn probability optimized for AUC-ROC                       |
 | XGBoost pred_contribs (SHAP) | Local + global feature attribution for the classification model       |
 
-Together they answer: who is at risk, how urgent is it, and why — in one unified dashboard.
+Together they answer: who is at risk, how urgent is it, and why · in one unified dashboard.
 
 ---
 
 ## Key Results
 
 - **Contract type** is the strongest predictor: month-to-month customers have materially shorter median survival than 1- or 2-year contract holders (exact values shown on the live dashboard).
-- **Targeting the top 20%** by churn score captures the majority of all churners — a 3-4x lift over random selection.
+- **Targeting the top 20%** by churn score captures the majority of all churners · a 3-4x lift over random selection.
 - **Online Security and Tech Support** are the strongest protective factors in the Cox model (HR < 1, p < 0.001).
 - Customers with above-median monthly charges churn at substantially higher rates than those below (computed live in the dashboard).
 
@@ -45,7 +46,7 @@ Together they answer: who is at risk, how urgent is it, and why — in one unifi
 
 ## Dataset
 
-IBM Telco Customer Churn — 7,043 customers, 19 features, 26.5% churn rate. Publicly available on Kaggle.
+IBM Telco Customer Churn · 7,043 customers, 19 features, 26.5% churn rate. Publicly available on Kaggle.
 
 ---
 
@@ -75,7 +76,7 @@ streamlit run app/app.py
 
 ```
 telecom-churn-survival/
-├── app/app.py          Streamlit dashboard (6 sections)
+├── app/app.py          Streamlit dashboard (5 sections)
 ├── src/train.py        Training pipeline: KM + Cox + classification + SHAP
 ├── models/             Serialized artifacts (joblib)
 ├── data/               Dataset (Telco-Customer-Churn.csv)

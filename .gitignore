@@ -3,3 +3,8 @@ __pycache__/
 .env
 src/__pycache__/
 app/__pycache__/
+
+# QA artifacts
+_qa/
+_qa_run.log
+_warm.log

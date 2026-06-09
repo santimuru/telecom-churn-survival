@@ -1,5 +1,5 @@
 """
-Telecom Churn Survival Analysis — Training Script
+Telecom Churn Survival Analysis · Training Script
 Trains XGBoost, Random Forest, and Logistic Regression classifiers,
 fits a Cox PH model and Kaplan-Meier curves, computes SHAP values,
 and saves all artifacts to models/.
@@ -320,13 +320,13 @@ def build_shap_data(pipeline, X_train, X_test, feature_names, model_name):
     rng = np.random.default_rng(42)
     idx = rng.choice(len(X_test_prep), n_shap, replace=False)
 
-    # Use XGBoost native SHAP (pred_contribs) — avoids SHAP library compatibility issues
+    # Use XGBoost native SHAP (pred_contribs) · avoids SHAP library compatibility issues
     import xgboost as xgb
     booster = clf.get_booster()
     X_sample = X_test_prep[idx].astype(np.float32)
     dmat = xgb.DMatrix(X_sample)
     contribs = booster.predict(dmat, pred_contribs=True)
-    # contribs shape: (n, n_features + 1) — last col is bias/expected_value
+    # contribs shape: (n, n_features + 1) · last col is bias/expected_value
     expected_value = float(contribs[:, -1].mean())
     shap_values = contribs[:, :-1]  # (n, n_features)
 
@@ -357,7 +357,7 @@ def save_artifacts(pipeline, cox_model, km_data, shap_data, meta):
 # ── Main ──────────────────────────────────────────────────────────────────────
 def main():
     print("=" * 60)
-    print("Telecom Churn — Training Pipeline")
+    print("Telecom Churn · Training Pipeline")
     print("=" * 60)
 
     download_data()
