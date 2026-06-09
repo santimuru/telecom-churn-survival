@@ -1,10 +1,10 @@
 """
 app.py  Telecom Churn · Survival Analysis
 
-Design system: Clinical Actuarial Dossier.
-Cool bone ground, slate ink, a three-state signal scale (teal protective /
-amber caution / rust hazard), Space Grotesk display + IBM Plex Mono for figures,
-hairline case-file rules, mono micro-labels, zero rounding, no decorative chrome.
+Design system: Data Terminal.
+Near-black ground, JetBrains Mono throughout, neon signal scale (cyan protective /
+amber elevated / magenta hazard), big monospace readouts, panel grid, // section
+markers, zero rounding. A BI cockpit, not an editorial page.
 """
 
 import warnings
@@ -22,43 +22,45 @@ ROOT       = Path(__file__).resolve().parent.parent
 MODELS_DIR = ROOT / "models"
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Design tokens · clinical / actuarial
+# Design tokens · data terminal
 # ─────────────────────────────────────────────────────────────────────────────
-BONE   = "#ECEFF3"   # cool off-white ground
-PANEL  = "#E1E6EC"   # deeper panel ground
-INK    = "#1B2A3A"   # cool slate near-black
-INK60  = "#5A6B7B"   # muted slate for secondary text
-RULE   = "#1B2A3A"   # hairline colour
-LINE   = "#C7D0DA"   # faint grid / divider
-NAVY   = "#243B55"   # structural deep blue
+BONE   = "#0A0E14"   # near-black terminal ground
+PANEL  = "#111A24"   # panel ground
+PANEL2 = "#0E1620"   # deeper inset
+INK    = "#E8F0F6"   # light readout text / values
+INK60  = "#7E92A6"   # muted label text
+RULE   = "#22323F"   # divider
+LINE   = "#1A2530"   # faint grid
+BORDER = "#223040"   # panel border
+NAVY   = "#8B9CFF"   # violet secondary series
 
-PROTECT = "#0E7C66"  # teal · protective factor / low risk / high survival
-CAUTION = "#B7791F"  # amber · elevated
-HAZARD  = "#B3361F"  # rust · high churn risk / hazard
-NEUTRAL = "#6B7785"  # cool grey · non-significant
+PROTECT = "#2BE8C8"  # cyan · protective / low risk / high survival
+CAUTION = "#FFC23D"  # amber · elevated
+HAZARD  = "#FF4D8D"  # magenta · high churn risk / hazard
+NEUTRAL = "#4A5B6B"  # grey · non-significant
 
-# Chart series: slate, hazard, protect, amber, navy, grey. No rainbow.
+# Chart series: white, magenta, cyan, amber, violet, grey. Neon on dark.
 SERIES = [INK, HAZARD, PROTECT, CAUTION, NAVY, NEUTRAL]
 
-# Diverging scale for survival heatmaps: hazard(low survival) → bone → protect(high)
-SURV_SCALE = [[0.0, HAZARD], [0.5, "#E8E2D2"], [1.0, PROTECT]]
-# Diverging scale for SHAP feature value (low → high): protect → bone → hazard
-SHAP_SCALE = [[0.0, PROTECT], [0.5, "#DFE4E0"], [1.0, HAZARD]]
+# Diverging scale for survival heatmaps: hazard(low survival) → mid → protect(high)
+SURV_SCALE = [[0.0, HAZARD], [0.5, "#243240"], [1.0, PROTECT]]
+# Diverging scale for SHAP feature value (low → high): protect → mid → hazard
+SHAP_SCALE = [[0.0, PROTECT], [0.5, "#243240"], [1.0, HAZARD]]
 
 PLOTLY_TEMPLATE = go.layout.Template(layout=dict(
-    xaxis=dict(gridcolor=LINE, zerolinecolor="#B4BEC9", linecolor=INK, ticks="outside",
-               tickcolor=INK, tickfont=dict(family="IBM Plex Mono, monospace", size=11)),
-    yaxis=dict(gridcolor=LINE, zerolinecolor="#B4BEC9", linecolor=INK, ticks="outside",
-               tickcolor=INK, tickfont=dict(family="IBM Plex Mono, monospace", size=11)),
+    xaxis=dict(gridcolor=LINE, zerolinecolor="#243240", linecolor=BORDER, ticks="outside",
+               tickcolor=BORDER, tickfont=dict(family="JetBrains Mono, monospace", size=11, color=INK60)),
+    yaxis=dict(gridcolor=LINE, zerolinecolor="#243240", linecolor=BORDER, ticks="outside",
+               tickcolor=BORDER, tickfont=dict(family="JetBrains Mono, monospace", size=11, color=INK60)),
 ))
 
 def layout(**kw):
-    """Base plotly layout on the clinical palette. Pass overrides via kw."""
+    """Base plotly layout on the terminal palette. Pass overrides via kw."""
     base = dict(
-        plot_bgcolor=BONE, paper_bgcolor=BONE,
-        font=dict(color=INK, family="Space Grotesk, sans-serif", size=13),
+        plot_bgcolor=PANEL, paper_bgcolor=PANEL,
+        font=dict(color=INK60, family="JetBrains Mono, monospace", size=12),
         colorway=SERIES, template=PLOTLY_TEMPLATE,
-        title=dict(font=dict(family="Space Grotesk, sans-serif", size=15, color=INK)),
+        title=dict(font=dict(family="JetBrains Mono, monospace", size=13, color=INK)),
         margin=dict(l=60, r=30, t=56, b=60),
         legend=dict(font=dict(size=11)),
     )
@@ -69,142 +71,136 @@ def layout(**kw):
 def risk_state(prob: float):
     """Map a churn probability to (label, colour, tint)."""
     if prob >= 0.60:
-        return "HIGH RISK", HAZARD, "rgba(179,54,31,0.10)"
+        return "HIGH RISK", HAZARD, "rgba(255,77,141,0.12)"
     if prob >= 0.40:
-        return "ELEVATED", CAUTION, "rgba(183,121,31,0.12)"
-    return "LOW RISK", PROTECT, "rgba(14,124,102,0.10)"
+        return "ELEVATED", CAUTION, "rgba(255,194,61,0.12)"
+    return "LOW RISK", PROTECT, "rgba(43,232,200,0.10)"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Page config + global stylesheet
 # ─────────────────────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="Churn · Survival Dossier",
-    page_icon="◴",
+    page_title="CHURN.term",
+    page_icon="◖",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
 
 st.markdown(f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
 
-:root {{ --ink:{INK}; --bone:{BONE}; --ink60:{INK60}; --hazard:{HAZARD}; --protect:{PROTECT}; }}
+:root {{ --ink:{INK}; --bg:{BONE}; --panel:{PANEL}; --ink60:{INK60}; --bd:{BORDER};
+  --hazard:{HAZARD}; --protect:{PROTECT}; }}
 
 html, body, [class*="css"], .stMarkdown, p, li, span, div {{
-  font-family:'Space Grotesk', system-ui, sans-serif;
-}}
+  font-family:'JetBrains Mono', ui-monospace, monospace; }}
 .stApp {{ background:{BONE}; color:{INK}; }}
-
-/* kill rounding everywhere · dossier baseline */
 .stApp *, [data-testid] * {{ border-radius:0 !important; }}
-
-/* no sidebar */
 [data-testid="stSidebar"], [data-testid="stSidebarCollapsedControl"] {{ display:none !important; }}
+.block-container {{ max-width:1240px; padding-top:2.8rem; padding-bottom:4rem; }}
 
-.block-container {{ max-width:1160px; padding-top:2.6rem; padding-bottom:4rem; }}
+/* headings · terminal display, big numerals */
+h1 {{ font-weight:800; letter-spacing:-0.02em; line-height:0.96;
+  font-size:clamp(2.6rem,5.2vw,4.4rem); color:{INK}; margin:0.6rem 0 0.3rem 0; }}
+h2 {{ font-weight:700; letter-spacing:-0.01em; font-size:1.4rem; color:{INK}; margin:0.4rem 0 0.7rem 0; }}
+h3 {{ font-weight:700; font-size:1.0rem; color:{INK}; }}
+h4 {{ font-weight:600; text-transform:uppercase; letter-spacing:0.16em;
+  font-size:0.68rem; color:{PROTECT}; }}
 
-/* headings */
-h1 {{ font-weight:700; letter-spacing:-0.02em; line-height:1.0;
-  font-size:clamp(2.1rem,4.4vw,3.5rem); color:{INK}; margin:0.1rem 0 0.4rem 0; }}
-h2 {{ font-weight:700; letter-spacing:-0.01em; font-size:1.5rem; color:{INK};
-  margin:0.4rem 0 0.7rem 0; }}
-h3 {{ font-weight:600; font-size:1.05rem; color:{INK}; letter-spacing:-0.01em; }}
-h4 {{ font-weight:600; text-transform:uppercase; letter-spacing:0.08em;
-  font-size:0.74rem; color:{INK60}; font-family:'IBM Plex Mono',monospace; }}
+/* masthead · status bar */
+.masthead {{ display:flex; align-items:center; justify-content:space-between;
+  border-bottom:1px solid {BORDER}; padding:0.4rem 0 0.5rem; margin-bottom:0.2rem; }}
+.masthead .brand {{ font-weight:800; letter-spacing:0.14em; text-transform:uppercase;
+  font-size:0.74rem; color:{PROTECT}; }}
+.masthead .meta {{ font-size:0.68rem; text-transform:uppercase; letter-spacing:0.10em; color:{INK60}; }}
+.masthead .meta b {{ color:{INK}; }} .masthead .dot {{ color:{HAZARD}; }}
 
-/* masthead */
-.masthead {{ display:flex; align-items:baseline; justify-content:space-between;
-  border-bottom:2px solid {INK}; padding-bottom:0.45rem; margin-bottom:0.2rem; }}
-.masthead .brand {{ font-family:'IBM Plex Mono',monospace; font-weight:600;
-  text-transform:uppercase; letter-spacing:0.16em; font-size:0.72rem; color:{INK}; }}
-.masthead .meta {{ font-family:'IBM Plex Mono',monospace; font-size:0.68rem;
-  text-transform:uppercase; letter-spacing:0.14em; color:{INK60}; }}
-
-/* top nav (styled radio) */
+/* top nav · tab cells */
 div[data-testid="stRadio"] > label {{ display:none; }}
 div[data-testid="stRadio"] [role="radiogroup"] {{
-  display:flex; gap:0; border-bottom:1px solid {INK}; margin-bottom:1.6rem; flex-wrap:wrap; }}
+  display:flex; gap:0; border:1px solid {BORDER}; margin:0.9rem 0 1.8rem; flex-wrap:wrap; background:{PANEL}; }}
 div[data-testid="stRadio"] [role="radiogroup"] label {{
-  margin:0; padding:0.5rem 0; cursor:pointer; }}
+  margin:0; padding:0; cursor:pointer; border-right:1px solid {BORDER}; }}
 div[data-testid="stRadio"] [role="radiogroup"] label > div:first-child {{ display:none; }}
 div[data-testid="stRadio"] [role="radiogroup"] label > div:last-child p {{
-  font-family:'IBM Plex Mono',monospace; font-weight:500; text-transform:uppercase;
-  letter-spacing:0.10em; font-size:0.74rem; color:{INK60}; padding:0 1.4rem 0 0; margin:0; }}
+  font-weight:600; text-transform:uppercase; letter-spacing:0.10em;
+  font-size:0.72rem; color:{INK60}; padding:0.55rem 1.3rem; margin:0; }}
 div[data-testid="stRadio"] [role="radiogroup"] label:has(input:checked) > div:last-child p {{
-  color:{INK}; box-shadow:inset 0 -3px 0 0 {HAZARD}; }}
+  color:{BONE}; background:{PROTECT}; }}
 
 /* lede */
-.lede {{ font-size:1.12rem; line-height:1.55; color:{INK}; max-width:66ch; font-weight:400; }}
-.lede b {{ font-weight:600; }}
+.lede {{ font-size:1.0rem; line-height:1.65; color:{INK60}; max-width:74ch; font-weight:400; }}
+.lede b {{ color:{INK}; font-weight:600; }} .lede i {{ color:{PROTECT}; font-style:normal; }}
 
-/* KPI rail */
-.kpis {{ display:grid; grid-template-columns:repeat(4,1fr); border:1px solid {INK};
-  border-right:none; margin:1.3rem 0; }}
-.kpi {{ border-right:1px solid {INK}; padding:0.95rem 1.05rem; }}
-.kpi .v {{ font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:1.95rem;
-  line-height:1.05; color:{INK}; }}
+/* KPI readout grid */
+.kpis {{ display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:{BORDER};
+  border:1px solid {BORDER}; margin:1.4rem 0; }}
+.kpi {{ background:{PANEL}; padding:1.1rem 1.2rem; }}
+.kpi .v {{ font-weight:800; font-size:2.5rem; line-height:1; color:{INK}; letter-spacing:-0.02em; }}
 .kpi .v.haz {{ color:{HAZARD}; }} .kpi .v.pro {{ color:{PROTECT}; }}
-.kpi .k {{ font-family:'IBM Plex Mono',monospace; font-size:0.64rem; text-transform:uppercase;
-  letter-spacing:0.10em; color:{INK60}; margin-top:0.45rem; }}
-.kpi .s {{ font-family:'IBM Plex Mono',monospace; font-size:0.66rem; color:{INK60}; margin-top:0.2rem; }}
+.kpi .k {{ font-size:0.62rem; text-transform:uppercase; letter-spacing:0.14em;
+  color:{INK60}; margin-top:0.6rem; }}
+.kpi .s {{ font-size:0.64rem; color:{PROTECT}; margin-top:0.2rem; }}
 
 /* method / step grid */
-.steps {{ display:grid; grid-template-columns:repeat(3,1fr); border:1px solid {INK};
-  border-right:none; margin-top:0.4rem; }}
-.step {{ border-right:1px solid {INK}; padding:1rem 1.05rem; }}
-.step .n {{ font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:0.7rem;
-  color:{HAZARD}; letter-spacing:0.08em; }}
-.step .t {{ font-weight:600; font-size:0.92rem; margin:0.35rem 0 0.5rem 0; }}
-.step .d {{ font-size:0.82rem; color:{INK60}; line-height:1.5; }}
+.steps {{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:{BORDER};
+  border:1px solid {BORDER}; margin-top:0.4rem; }}
+.step {{ background:{PANEL}; padding:1.1rem 1.15rem; }}
+.step .n {{ font-weight:700; font-size:0.66rem; color:{HAZARD}; letter-spacing:0.10em; }}
+.step .t {{ color:{INK}; font-weight:700; font-size:0.92rem; margin:0.4rem 0 0.5rem 0; }}
+.step .d {{ font-size:0.8rem; color:{INK60}; line-height:1.55; }}
 .step .d b {{ color:{INK}; font-weight:600; }}
 
-/* generic bordered block */
-.blk {{ border:1px solid {INK}; padding:1rem 1.1rem; background:{BONE}; }}
-.blk.fill {{ background:{PANEL}; }}
+/* generic block */
+.blk {{ border:1px solid {BORDER}; padding:1rem 1.1rem; background:{PANEL}; }}
+.blk.fill {{ background:{PANEL2}; }}
 
-/* callout (left-ruled) */
-.callout {{ border-left:3px solid {NAVY}; padding:0.6rem 0.9rem; margin:0.9rem 0;
-  font-size:0.9rem; color:{INK}; background:{PANEL}; }}
+/* callout */
+.callout {{ border-left:3px solid {NAVY}; padding:0.65rem 0.95rem; margin:0.9rem 0;
+  font-size:0.88rem; color:{INK60}; background:{PANEL}; }}
+.callout b {{ color:{INK}; }}
 .callout.haz {{ border-left-color:{HAZARD}; }}
 .callout.pro {{ border-left-color:{PROTECT}; }}
 .callout.cau {{ border-left-color:{CAUTION}; }}
 
-/* finding list */
-.find {{ font-size:0.96rem; line-height:1.6; }}
-.find b {{ font-weight:600; }}
+/* findings */
+.find {{ font-size:0.94rem; line-height:1.7; color:{INK60}; }}
+.find b {{ color:{INK}; font-weight:600; }}
 
-/* findings tags */
-.tag {{ display:inline-block; border:1px solid {INK}; padding:2px 9px; margin:3px 5px 3px 0;
-  font-family:'IBM Plex Mono',monospace; font-size:0.72rem; font-weight:500; }}
+/* tags */
+.tag {{ display:inline-block; border:1px solid {BORDER}; padding:3px 10px; margin:3px 5px 3px 0;
+  font-size:0.7rem; font-weight:500; color:{INK60}; background:{PANEL}; }}
 .tag.haz {{ border-color:{HAZARD}; color:{HAZARD}; }}
 .tag.pro {{ border-color:{PROTECT}; color:{PROTECT}; }}
 
 /* buttons */
 .stButton > button, .stFormSubmitButton > button {{
-  border:1px solid {INK}; background:{INK}; color:{BONE};
-  font-family:'IBM Plex Mono',monospace; font-weight:500; text-transform:uppercase;
-  letter-spacing:0.08em; font-size:0.76rem; padding:0.5rem 1.3rem; }}
+  border:1px solid {PROTECT}; background:transparent; color:{PROTECT};
+  font-family:'JetBrains Mono',monospace; font-weight:600; text-transform:uppercase;
+  letter-spacing:0.10em; font-size:0.74rem; padding:0.5rem 1.4rem; }}
 .stButton > button:hover, .stFormSubmitButton > button:hover {{
-  background:{HAZARD}; border-color:{HAZARD}; color:{BONE}; }}
+  background:{PROTECT}; border-color:{PROTECT}; color:{BONE}; }}
 
-/* tabs (used sparingly) */
-.stTabs [data-baseweb="tab-list"] {{ border-bottom:1px solid {INK}; gap:0.3rem; }}
-.stTabs [data-baseweb="tab"] {{ font-family:'IBM Plex Mono',monospace; font-weight:500;
-  text-transform:uppercase; letter-spacing:0.06em; font-size:0.72rem; padding:0.5rem 1rem; }}
-.stTabs [aria-selected="true"] {{ box-shadow:inset 0 -3px 0 0 {HAZARD}; }}
+/* tabs */
+.stTabs [data-baseweb="tab-list"] {{ border-bottom:1px solid {BORDER}; gap:0; }}
+.stTabs [data-baseweb="tab"] {{ font-weight:600; text-transform:uppercase;
+  letter-spacing:0.08em; font-size:0.7rem; padding:0.5rem 1.1rem; color:{INK60}; }}
+.stTabs [aria-selected="true"] {{ color:{PROTECT} !important; box-shadow:inset 0 -2px 0 0 {PROTECT}; }}
 
-hr {{ border:none; border-top:1px solid {LINE}; margin:1.6rem 0; }}
-
-[data-testid="stDataFrame"] {{ border:1px solid {INK}; }}
-[data-testid="stMetricValue"] {{ font-family:'IBM Plex Mono',monospace; }}
+hr {{ border:none; border-top:1px solid {BORDER}; margin:1.6rem 0; }}
+[data-testid="stDataFrame"] {{ border:1px solid {BORDER}; }}
+[data-testid="stMetricValue"] {{ font-family:'JetBrains Mono',monospace; color:{INK}; }}
+[data-testid="stMetricLabel"] {{ color:{INK60}; }}
 
 /* inputs */
 textarea, input, .stTextArea textarea,
 .stSelectbox div[data-baseweb="select"] > div,
 .stNumberInput div[data-baseweb="input"] {{
-  border:1px solid {INK} !important; background:{BONE} !important; color:{INK} !important; }}
-.stSlider [data-baseweb="slider"] div[role="slider"] {{ background:{HAZARD} !important; }}
+  border:1px solid {BORDER} !important; background:{PANEL} !important; color:{INK} !important; }}
+.stSlider [data-baseweb="slider"] div[role="slider"] {{ background:{PROTECT} !important; }}
+label, .stSelectbox label, .stSlider label {{ color:{INK60} !important; }}
 ::placeholder {{ color:{INK60} !important; }}
 </style>
 """, unsafe_allow_html=True)
@@ -217,19 +213,21 @@ def masthead(meta):
     auc = meta["best_metrics"]["roc_auc"] if meta else 0
     st.markdown(
         f"""<div class="masthead">
-        <span class="brand">Churn Dossier · Survival Analysis</span>
-        <span class="meta">{meta['model_name'] if meta else '·'} · AUC {auc:.3f} ·
-        N={meta['n_samples']:,}</span></div>""",
+        <span class="brand">◖ CHURN.term</span>
+        <span class="meta">model <b>{meta['model_name'] if meta else '·'}</b> ·
+        auc <b>{auc:.3f}</b> · n=<b>{meta['n_samples']:,}</b> ·
+        <span class="dot">●</span> live</span></div>""",
         unsafe_allow_html=True)
 
 
 def rule(left: str, right: str = ""):
     st.markdown(
         f"""<div style="display:flex; align-items:baseline; justify-content:space-between;
-        border-top:1px solid {INK}; padding-top:0.45rem; margin:2.1rem 0 1rem 0;">
-        <span style="font-weight:700; font-size:1.18rem; letter-spacing:-0.01em;">{left}</span>
-        <span style="font-family:'IBM Plex Mono',monospace; font-size:0.66rem;
-        text-transform:uppercase; letter-spacing:0.12em; color:{INK60};">{right}</span></div>""",
+        border-top:1px solid {BORDER}; padding-top:0.5rem; margin:2.2rem 0 1rem 0;">
+        <span style="font-weight:700; font-size:1.0rem; color:{INK}; letter-spacing:0.02em;">
+        <span style="color:{HAZARD};">// </span>{left}</span>
+        <span style="font-size:0.64rem; text-transform:uppercase; letter-spacing:0.14em;
+        color:{INK60};">{right}</span></div>""",
         unsafe_allow_html=True)
 
 
@@ -489,7 +487,7 @@ elif section == "Survival":
         margin=dict(l=10, r=80, t=56, b=50),
         coloraxis_colorbar=dict(title="Survival", tickformat=".0%")))
     chart(fig_hm)
-    callout("Teal = high survival (low churn risk). Rust = low survival (high churn risk).", "")
+    callout("Cyan = high survival (low churn risk). Magenta = low survival (high churn risk).", "")
 
     # ── Cox forest ────────────────────────────────────────────────────────────
     rule("Cox proportional hazards", "hazard ratios")
@@ -656,8 +654,8 @@ elif section == "Model & Drivers":
                            ticktext=[feature_names[i] for i in idx], automargin=True),
                 height=520, margin=dict(l=10, r=100, t=56, b=56)))
             chart(fig)
-            st.markdown('<p style="font-size:0.84rem;color:#5A6B7B;">Rust = high feature value, '
-                        'teal = low. Right of zero pushes the prediction toward churn.</p>',
+            st.markdown('<p style="font-size:0.84rem;color:#7E92A6;">Magenta = high feature value, '
+                        'cyan = low. Right of zero pushes the prediction toward churn.</p>',
                         unsafe_allow_html=True)
         with sc2:
             top_b = 12
@@ -830,7 +828,7 @@ elif section == "Simulator":
                     xaxis_title="Model output (log-odds)", yaxis=dict(automargin=True),
                     height=420, margin=dict(l=10, r=40, t=56, b=50)))
                 chart(fig)
-                callout("Rust bars push toward churn, teal away. Base value is the population "
+                callout("Magenta bars push toward churn, cyan away. Base value is the population "
                         f"average log-odds ({exp_val:.2f}).", "")
             except Exception as e:
                 st.info(f"SHAP waterfall unavailable: {e}")

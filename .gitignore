@@ -8,3 +8,5 @@ app/__pycache__/
 _qa/
 _qa_run.log
 _warm.log
+
+_variant_*.py
