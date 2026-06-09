@@ -213,10 +213,9 @@ def masthead(meta):
     auc = meta["best_metrics"]["roc_auc"] if meta else 0
     st.markdown(
         f"""<div class="masthead">
-        <span class="brand">◖ CHURN.term</span>
-        <span class="meta">model <b>{meta['model_name'] if meta else '·'}</b> ·
-        auc <b>{auc:.3f}</b> · n=<b>{meta['n_samples']:,}</b> ·
-        <span class="dot">●</span> live</span></div>""",
+        <span class="brand">Telecom Churn · Survival</span>
+        <span class="meta"><b>{meta['model_name'] if meta else '·'}</b> ·
+        AUC <b>{auc:.3f}</b> · N=<b>{meta['n_samples']:,}</b></span></div>""",
         unsafe_allow_html=True)
 
 
