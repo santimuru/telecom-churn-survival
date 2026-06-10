@@ -138,7 +138,7 @@ div[data-testid="stRadio"] [role="radiogroup"] label:has(input:checked) > div:la
 .kpis {{ display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:{BORDER};
   border:1px solid {BORDER}; margin:1.4rem 0; }}
 .kpi {{ background:{PANEL}; padding:1.1rem 1.2rem; }}
-.kpi .v {{ font-weight:800; font-size:2.5rem; line-height:1; color:{INK}; letter-spacing:-0.02em; }}
+.kpi .v {{ font-weight:800; font-size:clamp(1.6rem,6vw,2.5rem); line-height:1; color:{INK}; letter-spacing:-0.02em; }}
 .kpi .v.haz {{ color:{HAZARD}; }} .kpi .v.pro {{ color:{PROTECT}; }}
 .kpi .k {{ font-size:0.62rem; text-transform:uppercase; letter-spacing:0.14em;
   color:{INK60}; margin-top:0.6rem; }}
@@ -202,6 +202,19 @@ textarea, input, .stTextArea textarea,
 .stSlider [data-baseweb="slider"] div[role="slider"] {{ background:{PROTECT} !important; }}
 label, .stSelectbox label, .stSlider label {{ color:{INK60} !important; }}
 ::placeholder {{ color:{INK60} !important; }}
+
+/* ===== Mobile responsive ===== */
+@media (max-width: 640px) {{
+  [data-testid="stHorizontalBlock"] {{ flex-direction:column !important; gap:.75rem !important; }}
+  [data-testid="stHorizontalBlock"] > [data-testid="column"],
+  [data-testid="stColumn"] {{ width:100% !important; flex:1 1 100% !important; min-width:0 !important; }}
+  .kpis, .steps {{ grid-template-columns:1fr !important; gap:.75rem !important; }}
+  .block-container {{ padding-left:1rem !important; padding-right:1rem !important; padding-top:1.6rem !important; }}
+  div[data-testid="stRadio"] [role="radiogroup"] label > div:last-child p {{ padding:0.5rem 0.9rem; font-size:0.66rem; }}
+}}
+@media (min-width:641px) and (max-width:960px) {{
+  .kpis, .steps {{ grid-template-columns:repeat(2,1fr) !important; }}
+}}
 </style>
 """, unsafe_allow_html=True)
 
